@@ -7,12 +7,11 @@ from rest_framework import status
 from .models import Product
 from .serializer import ProductAddSerializer
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import pagination
 from rest_framework.pagination import LimitOffsetPagination
-
-class AddProduct(APIView, LimitOffsetPagination):
+from rest_framework.generics import ListAPIView
+class AddProduct(APIView):
     permission_classes = (IsAuthenticated,)
-
+    pagination_class=LimitOffsetPagination
     model=Product
     serializer_class=ProductAddSerializer
     
@@ -30,12 +29,15 @@ class AddProduct(APIView, LimitOffsetPagination):
                 'errors':serializer.errors
             })
     
-    def get(self,request,*args,**kwargs):
-        product=Product.objects.all()
-        return Response({
-            'status':status.HTTP_201_CREATED,
-            'product_list':self.serializer_class(product,many=True).data
-        })
+
+class Product_list(ListAPIView):
+    queryset=Product.objects.all()
+    permission_classes = (IsAuthenticated,)
+    pagination_class=LimitOffsetPagination
+    model=Product
+    serializer_class=ProductAddSerializer
+
+
 
 class UpdateProduct(APIView):
     model=Product
